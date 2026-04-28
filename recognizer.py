@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+from features import extract_features_from_landmarks
 
 MODEL_PATH = "models/gesture_model.pkl"
 
@@ -17,13 +18,10 @@ def load_model():
 def predict(hand_landmarks):
     """
     Takes a mediapipe hand_landmarks object and returns predicted letter.
+    Uses engineered features for better accuracy.
     """
     model = load_model()
-    coords = []
-    for lm in hand_landmarks.landmark:
-        coords.extend([lm.x, lm.y, lm.z])
-
-    features = np.array(coords).reshape(1, -1)
+    features = extract_features_from_landmarks(hand_landmarks).reshape(1, -1)
     prediction = model.predict(features)[0]
     confidence = max(model.predict_proba(features)[0])
     return prediction, confidence
